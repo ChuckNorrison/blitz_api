@@ -16,21 +16,21 @@ from app.utils import (
 
 PLATFORM = config("platform", default=APIPlatform.RASPIBLITZ)
 if PLATFORM == APIPlatform.RASPIBLITZ:
-    from app.repositories.hardware_impl.raspiblitz import (
+    from app.repositories.hardware_impl.raspiblitz_hardware_impl import (
         HW_INFO_YIELD_TIME,
         get_hardware_info_impl,
     )
-    from app.repositories.system_impl.raspiblitz import (
+    from app.repositories.system_impl.raspiblitz_system_impl import (
         get_connection_info_impl,
         get_system_info_impl,
         shutdown_impl,
     )
 elif PLATFORM == APIPlatform.NATIVE_PYTHON:
-    from app.repositories.hardware_impl.native_python import (
+    from app.repositories.hardware_impl.native_python_hardware_impl import (
         HW_INFO_YIELD_TIME,
         get_hardware_info_impl,
     )
-    from app.repositories.system_impl.native_python import (
+    from app.repositories.system_impl.native_python_system_impl import (
         get_connection_info_impl,
         get_system_info_impl,
         shutdown_impl,

@@ -5,17 +5,14 @@ from app.utils import redis_get
 HW_INFO_YIELD_TIME = 2
 
 
-from fastapi_plugins import redis_plugin as r
-
-
 async def get_hardware_info_impl() -> map:
     info = {}
 
     loads = (await redis_get("system_cpu_load")).split(",")
     iloads = []
     total = 0
-    for l in loads:
-        value = float(l)
+    for load in loads:
+        value = float(load)
         total += value
         iloads.append(value)
     info["cpu_overall_percent"] = round(total / len(loads), 2)

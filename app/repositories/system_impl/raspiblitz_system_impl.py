@@ -10,6 +10,7 @@ from app.repositories.lightning import get_ln_info
 from app.utils import (
     SSE,
     call_script,
+    call_sudo_script,
     parse_key_value_text,
     redis_get,
     send_sse_message,
@@ -84,7 +85,8 @@ async def shutdown_impl(reboot: bool) -> bool:
     return True
 
 
-async def get_connection_info_impl() -> ConnectionInfo:
+async def get_connection_info_impl() -> ConnectionInfo:  # noqa
+    # TODO: This should be in a RaspiBlitz specific implementation
 
     lightning = await redis_get("lightning")
 

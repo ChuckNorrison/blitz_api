@@ -73,7 +73,7 @@ async def addinvoice(
 ):
     try:
         return await add_invoice(memo, value_msat, expiry, is_keysend)
-    except HTTPException as r:
+    except HTTPException:
         raise
     except NotImplementedError as r:
         raise HTTPException(status.HTTP_501_NOT_IMPLEMENTED, detail=r.args[0])
@@ -91,7 +91,7 @@ async def addinvoice(
 async def getwalletbalance():
     try:
         return await get_wallet_balance()
-    except HTTPException as r:
+    except HTTPException:
         raise
     except NotImplementedError as r:
         raise HTTPException(status.HTTP_501_NOT_IMPLEMENTED, detail=r.args[0])
@@ -112,7 +112,7 @@ Implementation in BlitzAPI is a [to-do](https://github.com/fusion44/blitz_api/is
 async def get_fee_revenue_path() -> FeeRevenue:
     try:
         return await get_fee_revenue()
-    except HTTPException as r:
+    except HTTPException:
         raise
     except NotImplementedError as r:
         raise HTTPException(status.HTTP_501_NOT_IMPLEMENTED, detail=r.args[0])
@@ -149,7 +149,7 @@ async def list_all_tx_path(
 ):
     try:
         return await list_all_tx(successful_only, index_offset, max_tx, reversed)
-    except HTTPException as r:
+    except HTTPException:
         raise
     except NotImplementedError as r:
         raise HTTPException(status.HTTP_501_NOT_IMPLEMENTED, detail=r.args[0])
@@ -189,7 +189,7 @@ async def list_invoices_path(
             num_max_invoices,
             reversed,
         )
-    except HTTPException as r:
+    except HTTPException:
         raise
     except NotImplementedError as r:
         raise HTTPException(status.HTTP_501_NOT_IMPLEMENTED, detail=r.args[0])
@@ -207,7 +207,7 @@ async def list_invoices_path(
 async def list_on_chain_tx_path():
     try:
         return await list_on_chain_tx()
-    except HTTPException as r:
+    except HTTPException:
         raise
     except NotImplementedError as r:
         raise HTTPException(status.HTTP_501_NOT_IMPLEMENTED, detail=r.args[0])
@@ -244,7 +244,7 @@ async def list_payments_path(
         return await list_payments(
             include_incomplete, index_offset, max_payments, reversed
         )
-    except HTTPException as r:
+    except HTTPException:
         raise
     except NotImplementedError as r:
         raise HTTPException(status.HTTP_501_NOT_IMPLEMENTED, detail=r.args[0])
@@ -263,7 +263,7 @@ async def list_payments_path(
 async def new_address_path(input: NewAddressInput):
     try:
         return await new_address(input)
-    except HTTPException as r:
+    except HTTPException:
         raise
     except NotImplementedError as r:
         raise HTTPException(status.HTTP_501_NOT_IMPLEMENTED, detail=r.args[0])
@@ -285,7 +285,7 @@ async def new_address_path(input: NewAddressInput):
 async def send_coins_path(input: SendCoinsInput):
     try:
         return await send_coins(input=input)
-    except HTTPException as r:
+    except HTTPException:
         raise
     except NotImplementedError as r:
         raise HTTPException(status.HTTP_501_NOT_IMPLEMENTED, detail=r.args[0])
@@ -309,7 +309,7 @@ async def open_channel_path(
 ):
     try:
         return await channel_open(local_funding_amount, node_URI, target_confs)
-    except HTTPException as r:
+    except HTTPException:
         raise
     except NotImplementedError as r:
         raise HTTPException(status.HTTP_501_NOT_IMPLEMENTED, detail=r.args[0])
@@ -329,7 +329,7 @@ async def open_channel_path(
 async def list_channels_path():
     try:
         return await channel_list()
-    except HTTPException as r:
+    except HTTPException:
         raise
     except NotImplementedError as r:
         raise HTTPException(status.HTTP_501_NOT_IMPLEMENTED, detail=r.args[0])
@@ -349,7 +349,7 @@ async def list_channels_path():
 async def close_channel_path(channel_id: str, force_close: bool):
     try:
         return await channel_close(channel_id, force_close)
-    except HTTPException as r:
+    except HTTPException:
         raise
     except NotImplementedError as r:
         raise HTTPException(status.HTTP_501_NOT_IMPLEMENTED, detail=r.args[0])
@@ -388,7 +388,7 @@ async def sendpayment(
 ):
     try:
         return await send_payment(pay_req, timeout_seconds, fee_limit_msat, amount_msat)
-    except HTTPException as r:
+    except HTTPException:
         raise
     except NotImplementedError as r:
         raise HTTPException(status.HTTP_501_NOT_IMPLEMENTED, detail=r.args[0])
@@ -406,7 +406,7 @@ async def sendpayment(
 async def get_info():
     try:
         return await get_ln_info()
-    except HTTPException as r:
+    except HTTPException:
         raise
     except NotImplementedError as r:
         raise HTTPException(status.HTTP_501_NOT_IMPLEMENTED, detail=r.args[0])
@@ -424,7 +424,7 @@ async def get_info():
 async def get_ln_info_lite_path():
     try:
         return await get_ln_info_lite()
-    except HTTPException as r:
+    except HTTPException:
         raise
     except NotImplementedError as r:
         raise HTTPException(status.HTTP_501_NOT_IMPLEMENTED, detail=r.args[0])
@@ -444,7 +444,7 @@ async def get_decode_pay_request(
 ):
     try:
         return await decode_pay_request(pay_req)
-    except HTTPException as r:
+    except HTTPException:
         raise
     except NotImplementedError as r:
         raise HTTPException(status.HTTP_501_NOT_IMPLEMENTED, detail=r.args[0])
@@ -467,7 +467,7 @@ async def get_decode_pay_request(
 async def unlock_wallet_path(input: UnlockWalletInput) -> bool:
     try:
         return await unlock_wallet(input.password)
-    except HTTPException as r:
+    except HTTPException:
         raise
     except NotImplementedError as r:
         raise HTTPException(status.HTTP_501_NOT_IMPLEMENTED, detail=r.args[0])

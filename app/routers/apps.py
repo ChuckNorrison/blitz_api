@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter, HTTPException, status
 from fastapi.params import Depends
 from pydantic import BaseModel
@@ -22,9 +24,11 @@ router = APIRouter(prefix=f"/{_PREFIX}", tags=["Apps"])
 async def get_status():
     try:
         return await repo.get_app_status()
-    except:
+    except Exception as e:
+        logging.error(e)
         raise HTTPException(
-            status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unknown error"
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Unknown error. Refer to the logs for more information.",
         )
 
 
@@ -37,9 +41,11 @@ async def get_status():
 async def get_single_status(id):
     try:
         return await repo.get_app_status_single(id)
-    except:
+    except Exception as e:
+        logging.error(e)
         raise HTTPException(
-            status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unknown error"
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Unknown error. Refer to the logs for more information.",
         )
 
 
@@ -50,12 +56,14 @@ async def get_single_status(id):
     response_description=docs.get_app_status_sub_response_docs,
     dependencies=[Depends(JWTBearer())],
 )
-async def get_status():
+async def get_status_subscription():
     try:
         return EventSourceResponse(repo.get_app_status_sub())
-    except:
+    except Exception as e:
+        logging.error(e)
         raise HTTPException(
-            status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unknown error"
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Unknown error. Refer to the logs for more information.",
         )
 
 

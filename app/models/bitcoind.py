@@ -297,12 +297,12 @@ class BlockchainInfo(BaseModel):
             chainwork=r["chainwork"],
             size_on_disk=r["size_on_disk"],
             pruned=r["pruned"],
-            pruned_height=None if not "pruneheight" in r else r["pruneheight"],
+            pruned_height=None if "pruneheight" not in r else r["pruneheight"],
             automatic_pruning=None
-            if not "automatic_pruning" in r
+            if "automatic_pruning" not in r
             else r["automatic_pruning"],
             prune_target_size=None
-            if not "prune_target_size" in r
+            if "prune_target_size" not in r
             else r["prune_target_size"],
             warnings=r["warnings"],
             softforks=softforks,
