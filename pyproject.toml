@@ -33,6 +33,8 @@ coverage = "6.4.2"
 pyclean = "2.2.0"
 pre-commit = "2.20.0"
 isort = "5.10.1"
+flake8 = "^5.0.4"
+mypy = "^0.971"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
