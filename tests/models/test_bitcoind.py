@@ -1,6 +1,13 @@
-from app.models.bitcoind import *
+from app.models.bitcoind import (
+    Bip9Statistics,
+    BlockchainInfo,
+    BtcInfo,
+    BtcLocalAddress,
+    BtcNetwork,
+    NetworkInfo,
+)
 
-blockhain_info = {
+blockchain_info = {
     "chain": "main",
     "blocks": 257524,
     "headers": 703160,
@@ -152,14 +159,14 @@ def test_Bip9Statistics():
 
 
 def test_BlockchainInfo():
-    i = BlockchainInfo.from_rpc(blockhain_info)
+    i = BlockchainInfo.from_rpc(blockchain_info)
     assert i
     assert len(i.softforks) == 6
 
 
 def test_BtcInfo():
     s = BtcInfo.from_rpc(
-        binfo=BlockchainInfo.from_rpc(blockhain_info),
+        binfo=BlockchainInfo.from_rpc(blockchain_info),
         ninfo=NetworkInfo.from_rpc(network_info),
     )
     assert s

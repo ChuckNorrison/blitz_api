@@ -10,9 +10,9 @@ from fastapi.openapi.utils import get_openapi
 # sudo apt install default-jre
 
 # For now assume that the clients repository is a sibling to the current working directory.
-out_path = os.path.abspath(os.path.join("../", f"blitz_api_client_libraries"))
+out_path = os.path.abspath(os.path.join("../", "blitz_api_client_libraries"))
 
-mod = importlib.import_module(f"app.main")
+mod = importlib.import_module("app.main")
 
 app = getattr(mod, "app")
 version = "v1"
@@ -65,7 +65,7 @@ def main():
         routes=app.routes if app.routes else None,
     )
 
-    with open(f"openapi.json", "w") as f:
+    with open("openapi.json", "w") as f:
         json.dump(specs, f, indent=2)
 
     _generate("dart-dio")

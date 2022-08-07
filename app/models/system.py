@@ -1,9 +1,8 @@
 from enum import Enum
-from typing import List, Optional
+from typing import Optional
 
 from decouple import config
 from fastapi import Query
-from fastapi.param_functions import Query
 from pydantic import BaseModel
 from pydantic.types import constr
 
@@ -13,7 +12,7 @@ from app.routers.system_docs import get_debug_data_sample_str
 class LoginInput(BaseModel):
     password: constr(min_length=8)
     one_time_password: Optional[
-        constr(min_length=6, max_length=6, regex="^[0-9]+$")
+        constr(min_length=6, max_length=6, regex=r"^[0-9]+$")  # noqa: F722
     ] = None
 
 

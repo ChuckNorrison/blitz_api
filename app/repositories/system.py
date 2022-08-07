@@ -66,14 +66,15 @@ def name_valid(password: str):
         return False
     if password.find(" ") >= 0:
         return False
-    return re.match("^[\.a-zA-Z0-9-_]*$", password)
+
+    return re.match(r"^[\.a-zA-Z0-9-_]*$", password)
 
 
 async def password_change(type: str, old_password: str, new_password: str):
 
     # check just allowed type values
     type = type.lower()
-    if not type in ["a", "b", "c"]:
+    if type not in ["a", "b", "c"]:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="unknown password type")
 
     # check password formatting
@@ -122,7 +123,7 @@ async def password_change(type: str, old_password: str, new_password: str):
 async def get_system_info() -> SystemInfo:
     try:
         return await get_system_info_impl()
-    except HTTPException as r:
+    except HTTPException:
         raise
     except NotImplementedError as r:
         raise HTTPException(status.HTTP_501_NOT_IMPLEMENTED, detail=r.args[0])

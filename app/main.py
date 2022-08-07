@@ -332,7 +332,7 @@ async def subscribe(request: Request, id: int, q: asyncio.Queue):
             else:
                 data = jsonable_encoder(await q.get())
                 yield data
-    except asyncio.CancelledError as e:
+    except asyncio.CancelledError:
         connections.pop(id)
         await request.close()
 

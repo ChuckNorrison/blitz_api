@@ -45,8 +45,8 @@ async def login(i: LoginInput):
     platform = ""
     try:
         platform = config("platform", cast=str)
-    except:
-        logging.warning(f"please set platform in env config file")
+    except Exception:
+        logging.warning("Please set platform variable in env config file")
 
     if platform == "raspiblitz":
         # script does not work when called from api yet
@@ -100,7 +100,7 @@ async def change_password(type: str, old_password: str, new_password: str):
 async def get_system_info_path():
     try:
         return await get_system_info()
-    except HTTPException as r:
+    except HTTPException:
         raise
     except NotImplementedError as r:
         raise HTTPException(status.HTTP_501_NOT_IMPLEMENTED, detail=r.args[0])

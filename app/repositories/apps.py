@@ -17,34 +17,34 @@ SHELL_SCRIPT_PATH = config("shell_script_path")
 node_type = config("ln_node")
 
 
-async def get_app_status_single(app_iD):
+async def get_app_status_single(app_ID):
 
-    if app_iD not in available_app_ids:
+    if app_ID not in available_app_ids:
         return {
-            "id": f"{app_iD}",
-            "error": f"appID not in list",
+            "id": f"{app_ID}",
+            "error": "appID not in list",
         }
     script_call = (
-        os.path.join(SHELL_SCRIPT_PATH, "config.scripts", f"bonus.{app_iD}.sh")
+        os.path.join(SHELL_SCRIPT_PATH, "config.scripts", f"bonus.{app_ID}.sh")
         + " status"
     )
 
     try:
         result = await call_sudo_script(script_call)
-    except:
+    except Exception:
         # script had error or was not able to deliver all requested data fields
         logging.warning(f"error on calling: {script_call}")
         return {
-            "id": f"{app_iD}",
+            "id": f"{app_ID}",
             "error": f"script not working for api: {script_call}",
         }
 
     try:
         data = parse_key_value_text(result)
-    except:
+    except Exception:
         logging.warning(f"error on parsing: {result}")
         return {
-            "id": f"{app_iD}",
+            "id": f"{app_ID}",
             "error": f"script result parsing error: {script_call}",
         }
 
@@ -72,13 +72,13 @@ async def get_app_status_single(app_iD):
             details = {}
 
             # set details for certain apps
-            if app_iD == "mempool" or app_iD == "btc-rpc-explorer":
+            if app_ID == "mempool" or app_ID == "btc-rpc-explorer":
                 details = {
                     "isIndexed": data["isIndexed"],
                     "indexInfo": data["indexInfo"],
                 }
             return {
-                "id": app_iD,
+                "id": app_ID,
                 "installed": installed,
                 "status": status,
                 "address": address,
@@ -91,15 +91,15 @@ async def get_app_status_single(app_iD):
             }
         else:
             return {
-                "id": app_iD,
+                "id": app_ID,
                 "installed": False,
                 "status": "offline",
                 "error": error,
             }
-    except:
+    except Exception:
         logging.warning(f"error on repackage data: {result}")
         return {
-            "id": f"{app_iD}",
+            "id": f"{app_ID}",
             "error": f"script result processing error: {script_call}",
         }
 
@@ -147,7 +147,7 @@ async def get_app_status_sub():
 
 
 async def install_app_sub(app_id: str):
-    if not app_id in available_app_ids:
+    if app_id not in available_app_ids:
         raise HTTPException(
             status.HTTP_400_BAD_REQUEST,
             detail=app_id + "install script does not exist / is not supported",
@@ -165,7 +165,7 @@ async def install_app_sub(app_id: str):
 
 
 async def uninstall_app_sub(app_id: str, delete_data: bool):
-    if not app_id in available_app_ids:
+    if app_id not in available_app_ids:
         raise HTTPException(
             status.HTTP_400_BAD_REQUEST, detail="script not exist/supported"
         )
@@ -209,26 +209,26 @@ async def run_bonus_script(app_id: str, params: str):
     if stdout:
         logging.info(f"[stdout]\n{stdout.decode()}")
     else:
-        logging.error(f"NO [stdout]")
+        logging.error("NO [stdout]")
     if stderr:
         logging.error(f"[stderr]\n{stderr.decode()}")
     else:
-        logging.error(f"NO [stderr]")
+        logging.error("NO [stderr]")
 
     # create log file
     logFileName = f"/var/cache/raspiblitz/temp/install.{app_id}.log"
     logging.info(f"WRITING LONG FILE: {logFileName}")
     with open(logFileName, "w", encoding="utf-8") as f:
         f.write(f"API triggered script: {cmd}\n")
-        f.write(f"###### STDOUT #######\n")
+        f.write("###### STDOUT #######\n")
         if stdout:
             f.write(stdout.decode())
-        f.write(f"\n###### STDERR #######\n")
+        f.write("\n###### STDERR #######\n")
         if stderr:
             f.write(stderr.decode())
 
     # sending final feedback event
-    logging.info(f"SENDING RESULT EVENT ...")
+    logging.info("SENDING RESULT EVENT ...")
     if stdout:
         stdoutData = parse_key_value_text(stdout.decode())
         logging.info(f"PARSED STDOUT DATA: {stdoutData}")
@@ -245,8 +245,8 @@ async def run_bonus_script(app_id: str, params: str):
                 },
             )
         # when there is no result (e.g. result="OK") at the end of install script stdout - consider also script had error
-        elif not "result" in stdoutData:
-            logging.error(f"NO `result=` returned by script:")
+        elif "result" not in stdoutData:
+            logging.error("NO `result=` returned by script:")
             await send_sse_message(
                 SSE.INSTALL_APP,
                 {
@@ -264,7 +264,7 @@ async def run_bonus_script(app_id: str, params: str):
 
             # in case of script error
             if updatedAppData["error"] != "":
-                logging.warning(f"Error Detected ...")
+                logging.warning("Error Detected ...")
                 logging.warning(f"updatedAppData: {updatedAppData}")
                 await send_sse_message(
                     SSE.INSTALL_APP,
@@ -279,7 +279,7 @@ async def run_bonus_script(app_id: str, params: str):
             # if install was running
             elif mode == "on":
                 if updatedAppData["installed"]:
-                    logging.info(f"WIN - install was effective")
+                    logging.info("WIN - install was effective")
                     await send_sse_message(
                         SSE.INSTALL_APP,
                         {
@@ -292,7 +292,7 @@ async def run_bonus_script(app_id: str, params: str):
                         },
                     )
                 else:
-                    logging.error(f"FAIL - was not installed")
+                    logging.error("FAIL - was not installed")
                     logging.warning(f"DEBUG - updatedAppData: {updatedAppData}")
                     logging.warning(f"DEBUG - params: {params}")
                     await send_sse_message(
@@ -307,9 +307,9 @@ async def run_bonus_script(app_id: str, params: str):
 
             # if uninstall was running
             elif mode == "off":
-                logging.warning(f"Checking if UNINSTALL worked ...")
+                logging.warning("Checking if UNINSTALL worked ...")
                 if updatedAppData["installed"]:
-                    logging.error(f"FAIL - is still installed")
+                    logging.error("FAIL - is still installed")
                     logging.warning(f"DEBUG - updatedAppData: {updatedAppData}")
                     logging.warning(f"DEBUG - params: {params}")
                     await send_sse_message(
@@ -322,7 +322,7 @@ async def run_bonus_script(app_id: str, params: str):
                         },
                     )
                 else:
-                    logging.info(f"WIN - uninstall was effective")
+                    logging.info("WIN - uninstall was effective")
                     await send_sse_message(
                         SSE.INSTALL_APP,
                         {
@@ -336,7 +336,7 @@ async def run_bonus_script(app_id: str, params: str):
             # send an updated state if that app
             await send_sse_message(SSE.INSTALLED_APP_STATUS, [updatedAppData])
     else:
-        logging.warning(f"Install Feedback Event: fail no stdout")
+        logging.warning("Install Feedback Event: fail no stdout")
         await send_sse_message(
             SSE.INSTALL_APP,
             {"id": app_id, "mode": params, "result": "fail", "details": "no stdout"},

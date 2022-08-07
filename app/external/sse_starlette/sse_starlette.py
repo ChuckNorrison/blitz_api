@@ -45,10 +45,10 @@ try:
         """
         Server.handle_exit = original_handler
 
-except ModuleNotFoundError as e:
+except ModuleNotFoundError:
     _log = logging.getLogger(__name__)
     # logging.basicConfig(level=logging.INFO)
-    _log.debug(f"Uvicorn not used, falling back to python standard logging.")
+    _log.debug("Uvicorn not used, falling back to python standard logging.")
 
 
 class SseState(enum.Enum):
@@ -167,7 +167,7 @@ class EventSourceResponse(Response):
         while True:
             message = await receive()
             if message["type"] == "http.disconnect":
-                _log.debug(f"Got event: http.disconnect. Stop streaming.")
+                _log.debug("Got event: http.disconnect. Stop streaming.")
                 break
 
     @staticmethod
@@ -183,7 +183,7 @@ class EventSourceResponse(Response):
         )
         self.stop_streaming()
         await self.wait()
-        _log.debug(f"streaming stopped.")
+        _log.debug("streaming stopped.")
 
         if self.background is not None:  # pragma: no cover, tested in StreamResponse
             await self.background()
@@ -217,7 +217,7 @@ class EventSourceResponse(Response):
             raise RuntimeError("Response is not started")
         with contextlib.suppress(asyncio.CancelledError):
             await self._ping_task
-            _log.debug(f"SSE ping stopped.")  # pragma: no cover
+            _log.debug("SSE ping stopped.")  # pragma: no cover
 
     def stop_streaming(self) -> None:
         """Used in conjunction with ``wait`` could be called from other task

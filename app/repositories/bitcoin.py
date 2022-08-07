@@ -52,7 +52,7 @@ async def initialize_bitcoin_repo() -> bool:
 
 async def get_blockchain_info() -> BlockchainInfo:
     result = await bitcoin_rpc_async("getblockchaininfo")
-    if result["error"] != None:
+    if result["error"] is not None:
         raise HTTPException(
             status.HTTP_500_INTERNAL_SERVER_ERROR, detail=result["error"]
         )
@@ -64,7 +64,7 @@ async def estimate_fee(
     mode: FeeEstimationMode = FeeEstimationMode.CONSERVATIVE,
 ) -> int:
     result = await bitcoin_rpc_async("estimatesmartfee", [target_conf, mode])
-    if result["error"] != None:
+    if result["error"] is not None:
         raise HTTPException(
             status.HTTP_500_INTERNAL_SERVER_ERROR, detail=result["error"]
         )
@@ -84,7 +84,7 @@ async def estimate_fee(
 
 async def get_network_info() -> NetworkInfo:
     result = await bitcoin_rpc_async("getnetworkinfo")
-    if result["error"] != None:
+    if result["error"] is not None:
         raise HTTPException(
             status.HTTP_500_INTERNAL_SERVER_ERROR, detail=result["error"]
         )

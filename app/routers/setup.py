@@ -26,6 +26,8 @@ configFilePath = "/mnt/hdd/raspiblitz.conf"
 # 2) update = updated version on fresh sd card
 # 3) migration = hdd got data from another node project
 # 4) setup = a fresh blitz to setup
+
+
 @router.get("/status")
 async def get_status():
     setupPhase = await redis_get("setupPhase")
@@ -40,7 +42,7 @@ async def get_status():
                 initialsync = "done"
             else:
                 initialsync = "running"
-        except:
+        except Exception:
             initialsync = ""
     else:
         initialsync = ""
@@ -65,7 +67,7 @@ async def setup_start_info():
     setupPhase = await redis_get("setupPhase")
     state = await redis_get("state")
     if state != "waitsetup":
-        logging.warning(f"/setup-start-info can only be called when nodes awaits setup")
+        logging.warning("/setup-start-info can only be called when nodes awaits setup")
         return HTTPException(status.status.HTTP_405_METHOD_NOT_ALLOWED)
 
     # get all the additional info needed to do setup dialog
@@ -110,36 +112,36 @@ async def setup_start_done(data: StartDoneData):
     hddGotBlockchain = await redis_get("hddBlocksBitcoin")
 
     if state != "waitsetup":
-        logging.warning(f"/setup-start-done can only be called when nodes awaits setup")
+        logging.warning("/setup-start-done can only be called when nodes awaits setup")
         return HTTPException(status.HTTP_405_METHOD_NOT_ALLOWED)
 
     # check if a fresh setup is forced
     if data.forceFreshSetup:
-        logging.warning(f"forcing node to fresh setup")
+        logging.warning("forcing node to fresh setup")
         setupPhase = "setup"
 
     #### SETUP ####
     if setupPhase == "setup":
-        if name_valid(data.hostname) == False:
-            logging.warning(f"hostname is not valid")
+        if name_valid(data.hostname) is False:
+            logging.warning("hostname is not valid")
             return HTTPException(status.HTTP_400_BAD_REQUEST)
         if (
             data.lightning != "lnd"
             and data.lightning != "cl"
             and data.lightning != "none"
         ):
-            logging.warning(f"lightning is not valid")
-        if password_valid(data.passwordA) == False:
-            logging.warning(f"passwordA is not valid")
+            logging.warning("lightning is not valid")
+        if password_valid(data.passwordA) is False:
+            logging.warning("passwordA is not valid")
             return HTTPException(status.HTTP_400_BAD_REQUEST)
-        if password_valid(data.passwordB) == False:
-            logging.warning(f"passwordB is not valid")
+        if password_valid(data.passwordB) is False:
+            logging.warning("passwordB is not valid")
             return HTTPException(status.HTTP_400_BAD_REQUEST)
-        if data.lightning != "none" and password_valid(data.passwordC) == False:
-            logging.warning(f"passwordC is not valid")
+        if data.lightning != "none" and password_valid(data.passwordC) is False:
+            logging.warning("passwordC is not valid")
             return HTTPException(status.HTTP_400_BAD_REQUEST)
         if hddGotBlockchain != "1" and data.keepBlockchain:
-            logging.warning(f"cannot keep blockchain that does not exists")
+            logging.warning("cannot keep blockchain that does not exists")
             return HTTPException(status.HTTP_400_BAD_REQUEST)
         if data.keepBlockchain:
             formatHDD = 0
@@ -168,9 +170,9 @@ async def setup_start_done(data: StartDoneData):
 
     #### RECOVERY ####
     elif setupPhase == "recovery" or setupPhase == "update":
-        logging.warning(f"check recovery data")
-        if password_valid(data.passwordA) == False:
-            logging.warning(f"passwordA is not valid")
+        logging.warning("check recovery data")
+        if password_valid(data.passwordA) is False:
+            logging.warning("passwordA is not valid")
             return HTTPException(status.HTTP_400_BAD_REQUEST)
         write_text_file(
             setupFilePath, ["setPasswordA=1", f"passwordA='{data.passwordA}'"]
@@ -178,19 +180,19 @@ async def setup_start_done(data: StartDoneData):
 
     #### MIGRATION ####
     elif setupPhase == "migration":
-        logging.warning(f"check migration data")
+        logging.warning("check migration data")
         hddGotMigrationData = await redis_get("hddGotMigrationData")
         if hddGotMigrationData == "":
-            logging.warning(f"hddGotMigrationData is not available")
+            logging.warning("hddGotMigrationData is not available")
             return HTTPException(status.HTTP_400_BAD_REQUEST)
-        if password_valid(data.passwordA) == False:
-            logging.warning(f"passwordA is not valid")
+        if password_valid(data.passwordA) is False:
+            logging.warning("passwordA is not valid")
             return HTTPException(status.HTTP_400_BAD_REQUEST)
-        if password_valid(data.passwordB) == False:
-            logging.warning(f"passwordB is not valid")
+        if password_valid(data.passwordB) is False:
+            logging.warning("passwordB is not valid")
             return HTTPException(status.HTTP_400_BAD_REQUEST)
-        if password_valid(data.passwordC) == False:
-            logging.warning(f"passwordC is not valid")
+        if password_valid(data.passwordC) is False:
+            logging.warning("passwordC is not valid")
             return HTTPException(status.HTTP_400_BAD_REQUEST)
         write_text_file(
             setupFilePath,
@@ -241,7 +243,6 @@ async def setup_final_info():
     # syncProgressFull=[percent] = (later WebUi can offer sync from another RaspiBlitz)
 
     # first check that node is really in setup state
-    setupPhase = await redis_get("setupPhase")
     state = await redis_get("state")
     if state != "waitfinal":
         logging.warning(
@@ -255,7 +256,7 @@ async def setup_final_info():
     data = parse_key_value_lines(result_lines)
     try:
         seedwordsNEW = data["seedwordsNEW"]
-    except:
+    except Exception:
         seedwordsNEW = ""
 
     return {"seedwordsNEW": seedwordsNEW}
@@ -266,10 +267,9 @@ async def setup_final_info():
 async def setup_final_done():
 
     # first check that node is really in setup state
-    setupPhase = await redis_get("setupPhase")
     state = await redis_get("state")
     if state != "waitfinal":
-        logging.warning(f"/setup-final-done can only be called when nodes awaits final")
+        logging.warning("/setup-final-done can only be called when nodes awaits final")
         return HTTPException(status.HTTP_405_METHOD_NOT_ALLOWED)
 
     await call_script("/home/admin/_cache.sh set state donefinal")
@@ -283,10 +283,10 @@ async def get_shutdown():
     setupPhase = await redis_get("setupPhase")
     state = await redis_get("state")
     if setupPhase == "done":
-        logging.warning(f"can only be called when the nodes is not finalized yet")
+        logging.warning("can only be called when the nodes is not finalized yet")
         return HTTPException(status.status.HTTP_405_METHOD_NOT_ALLOWED)
     if state != "waitsetup":
-        logging.warning(f"can only be called when nodes awaits setup")
+        logging.warning("can only be called when nodes awaits setup")
         return HTTPException(status.status.HTTP_405_METHOD_NOT_ALLOWED)
 
     # do the shutdown
@@ -300,7 +300,7 @@ async def setup_sync_info():
     # first check that node is really in setup state
     setupPhase = await redis_get("setupPhase")
     if setupPhase != "done":
-        logging.warning(f"sync info not available yet")
+        logging.warning("sync info not available yet")
         return HTTPException(status.HTTP_405_METHOD_NOT_ALLOWED)
 
     try:
@@ -313,7 +313,7 @@ async def setup_sync_info():
         btc_default_sync_percentage = await redis_get("btc_default_sync_percentage")
         btc_default_peers = await redis_get("btc_default_peers")
         system_count_start_blockchain = await redis_get("system_count_start_blockchain")
-    except:
+    except Exception:
         initialsync = ""
         btc_default_ready = ""
         btc_default_sync_percentage = ""
@@ -324,7 +324,7 @@ async def setup_sync_info():
         ln_default_ready = await redis_get("ln_default_ready")
         ln_default_locked = await redis_get("ln_default_locked")
         system_count_start_lightning = await redis_get("system_count_start_lightning")
-    except:
+    except Exception:
         ln_default = ""
         ln_default_ready = ""
         ln_default_locked = ""
